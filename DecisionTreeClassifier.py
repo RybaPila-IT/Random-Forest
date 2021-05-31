@@ -2,7 +2,14 @@ import numpy as np
 
 
 class DecisionTree:
+    """Class representing Decision Tree Classifier.
 
+    Class implements decision tree. Algorithm used for the tree construction
+    is the ID3 algorithm. Algorithm uses information gain metric as the estimator
+    for specified inner node split decision.
+
+    NOTE: After training, this class may suffer over-fitting, due to used algorithm.
+    """
     class TreeNode:
 
         def __init__(self, data, target):
@@ -59,7 +66,28 @@ class DecisionTree:
             return data[feature].value_counts().idxmax()
 
     def __init__(self, data, target):
+        """Creates decision tree from given training dataset.
+
+        Constructor initializing decision tree with the usage of passed training dataset.
+        Decision tree is being constructed with the usage of the ID3 algorithm.
+        Target data (the data column about which we do want to make predictions) is
+        specified with target input variable.
+
+        :param data   - pandas DataFrame object containing training dataset.
+        :param target - name of the column present in 'data' object representing the target of predictions.
+        """
         self._root = self.TreeNode(data, target)
 
     def predict(self, x_):
+        """Predicts the result for input example.
+
+        Function predicts output for the input variable. The decision is being
+        made after previous training which used specified dataset (see __init__).
+        Input variable should be consistent with the training dataset
+        (names of the columns, not missing values etc.).
+
+        :param x_ - input variable about which we are making prediction.
+
+        :returns prediction (the most possible output) about given input example.
+        """
         return self._root.predict(x_)
