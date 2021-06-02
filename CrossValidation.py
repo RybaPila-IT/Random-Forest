@@ -18,9 +18,12 @@ class CrossValidator:
         test_start = 0
         data = data.sample(frac=1).reset_index(drop=True)  # shuffling data
 
-        for _ in range(0, k):
-            test_subset = data.iloc[test_start:subset_size, :]
-            training_subset = data.iloc[(test_start + subset_size):, :]
+        for _ in range(0, k - 1):
+            test_subset = data.iloc[test_start:(test_start + subset_size), :]
+            training_subset = data.drop(range(test_start, (test_start + subset_size)))
             self.subset_pairs.append((test_subset, training_subset))
             test_start = test_start + subset_size
 
+        test_subset = data.iloc[test_start:, :]
+        training_subset = data.drop(range(test_start, len(data)))
+        self.subset_pairs.append((test_subset, training_subset))
