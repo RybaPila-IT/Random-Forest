@@ -42,7 +42,9 @@ class DecisionTree:
             if self.is_leaf:
                 return self.ans
 
-            return self.sub_trees[x_[self.split_feature]].predict(x_)
+            return self.sub_trees[x_[self.split_feature]].predict(x_) \
+                if x_[self.split_feature] in self.sub_trees \
+                else self.sub_trees[next(iter(self.sub_trees))].predict(x_)
 
         @staticmethod
         def _entropy(data):
