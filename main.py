@@ -19,7 +19,8 @@ if __name__ == '__main__':
     tree = DecisionTree(validator.subset_pairs[0][1].head(n=20), TARGET)
 
     for index in range(0, len(validator.subset_pairs[0][0])):
-        print("prediction Dalc: " + str(tree.predict(validator.subset_pairs[0][0].iloc[index, :])))
+        result = validator.subset_pairs[0][0].iloc[index, :]
+        print("prediction Dalc: " + str(tree.predict(result)))
         # print("real Dalc: " + str(validator.subset_pairs[0][0].iloc[0, 26]))
     # print(data.head)
     #
