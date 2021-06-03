@@ -7,15 +7,19 @@ from DecisionTreeClassifier import DecisionTree
 
 
 class RandomForest:
-
-    def __init__(self, number_of_trees: int, data: DataFrame, target_column_name):
+    """
+    Creates random forest with a specified number of trees.
+    """
+    def __init__(self, number_of_trees: int, data: DataFrame, target_column_name, tree_size):
         self.number_of_trees = number_of_trees
         self.data = data
         self.target_column_name = target_column_name
         self.forest = []
+        self.tree_size = tree_size
 
     def create_forest(self):
-        for _ in range(0, self.number_of_trees):
+        for tree_index in range(0, self.number_of_trees):
+            print("Creating tree " + str(tree_index))
             random_subset = []
             random_subset = self.pick_random_subset(random_subset)
             random_attributes = []
@@ -25,9 +29,8 @@ class RandomForest:
             self.forest.append(tree)
 
     def pick_random_subset(self, random_subset):
-        for row_index in range(0, self.number_of_trees):
+        for row_index in range(0, self.tree_size):
             random_subset.append(np.random.randint(0, len(self.data)))
-
         return random_subset
 
     def pick_random_attributes(self, random_attributes):
@@ -42,6 +45,12 @@ class RandomForest:
         return [self.data.columns.get_loc(col) for col in attributes_to_take.columns]
 
     def classify(self, data_to_classify):
+        """
+        Classifies data by checking which answer is the most common in the entire forest.
+
+        :param data_to_classify - data to be classified.
+        :return final_answer - most common result in the entire forest.
+        """
         answer_occurrences = {}
         max_occurrences = -1
         final_answer = 0
