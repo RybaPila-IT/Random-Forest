@@ -14,6 +14,12 @@ class CrossValidator:
         self.create_subsets(data, k)
 
     def create_subsets(self, data: pd.DataFrame, k):
+        """
+        Splits given dataset into k chunks of equal size and puts them in a list of pairs (testing set, training set).
+
+        :param data - pandas DataFrame containing full dataset.
+        :param k - number of equal chunks for the dataset to be split into.
+        """
         subset_size = len(data) // k
         test_start = 0
         data = data.sample(frac=1).reset_index(drop=True)  # shuffling data
