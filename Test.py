@@ -1,53 +1,64 @@
-# Author: Julia Skoneczna
+# Author: Radoslaw Radziukiewicz
 import pandas as pd
-from DecisionTreeClassifier import DecisionTree
 from CrossValidation import CrossValidator
 from RandomForest import RandomForest
-
-DATA_POR = 'data/student-por.csv'
-DATA_MAT = 'data/student-mat.csv'
-TARGET = 'Dalc'
-TARGET_COL = 26
 
 
 class TestRunner:
 
-    def __init__(self):
-        data_mat = pd.read_csv(DATA_MAT)
-        data_por = pd.read_csv(DATA_POR)
-        self.data = pd.concat([data_por, data_mat], axis=0)
-        self.validator = CrossValidator(self.data, 5)
+    def __init__(self, data: pd.DataFrame, target: str):
+        self.data = data
+        self.target = target
 
-    def tree_test(self):  # debug
-        for pair in range(0, len(self.validator.subset_pairs)):
-            print("Pair " + str(pair))
-            tree = DecisionTree(self.validator.subset_pairs[pair][1].head(n=10), TARGET)
-            for index in range(0, len(self.validator.subset_pairs[pair][0])):
-                predicted = tree.predict(self.validator.subset_pairs[pair][0].iloc[index, :])
-                real = self.validator.subset_pairs[pair][0].iloc[index, TARGET_COL]
-                if predicted != real:
-                    print("Bad prediction for row " + str(index) + ", predicted " + str(predicted) + ", real value " +
-                          str(real))
+    def _compute_accuracy_with_validator(self, f_size: int, t_size: int, v: CrossValidator) -> float:
+        accuracies = []
 
-    def forest_test(self):
-        accuracy = []
-        for pair in range(0, len(self.validator.subset_pairs)):
-            good_results = 0
-            bad_results = 0
-            print("Pair " + str(pair))
-            forest = RandomForest(50, self.validator.subset_pairs[pair][1], TARGET, 2)
+        for pair in v.subset_pairs:
+            forest = RandomForest(f_size, pair[1], self.target, t_size)
             forest.create_forest()
-            for index in range(0, len(self.validator.subset_pairs[pair][0])):
-                predicted = forest.classify(self.validator.subset_pairs[pair][0].iloc[index, :])
-                real = self.validator.subset_pairs[pair][0].iloc[index, TARGET_COL]
-                if predicted != real:
-                    bad_results = bad_results + 1
-                    # print("Bad prediction for row " + str(index) + ", predicted " + str(predicted) + ", real value " +
-                    #       str(real))
-                else:
-                    good_results = good_results + 1
+            accuracies.append(AccuracyMetric.measure(forest, pair[0], self.target))
 
-            all_results = good_results + bad_results
-            accuracy.append(good_results * 100 / all_results)
+        return sum(accuracies) / len(accuracies)
 
-        print("Accuracy: " + str(sum(accuracy) / len(accuracy)))
+    def test_cross_validation_split(self, split: list, f_size: int, t_size: int, verbose=True) -> list:
+        accuracies = []
+
+        for s_ in split:
+            validator = CrossValidator(self.data, s_)
+            accuracies.append((split, self._compute_accuracy_with_validator(f_size, t_size, validator)))
+
+            if verbose:
+                print("Ended test for split amount: {:d}".format(s_))
+
+        return accuracies
+
+    def test_forest_size(self, split: int, f_size: list, t_size: int, verbose=True) -> list:
+        accuracies = []
+        validator = CrossValidator(self.data, split)
+
+        for f_ in f_size:
+            accuracies.append((f_, self._compute_accuracy_with_validator(f_, t_size, validator)))
+
+            if verbose:
+                print("Ended test for forest size: {:d}".format(f_))
+
+        return accuracies
+
+    def test_tree_size_in_forest(self, split: int, f_size: int, t_size: list, verbose=True) -> list:
+        accuracies = []
+        validator = CrossValidator(self.data, split)
+
+        for t_ in t_size:
+            accuracies.append((t_, self._compute_accuracy_with_validator(f_size, t_, validator)))
+
+            if verbose:
+                print("Ended test for tree size: {:d}".format(t_))
+
+        return accuracies
+
+
+class AccuracyMetric:
+    @staticmethod
+    def measure(classifier, test_dataset: pd.DataFrame, target: str):
+        predictions = [classifier.predict(x_) == x_[target] for _, x_ in test_dataset.iterrows()]
+        return 100 * sum(predictions) / len(predictions)

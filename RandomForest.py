@@ -19,7 +19,6 @@ class RandomForest:
 
     def create_forest(self):
         for tree_index in range(0, self.number_of_trees):
-            print("Creating tree " + str(tree_index))
             random_subset = []
             random_subset = self.pick_random_subset(random_subset)
             random_attributes = []
@@ -44,7 +43,7 @@ class RandomForest:
         attributes_to_take = self.data.drop(attributes, axis=1)
         return [self.data.columns.get_loc(col) for col in attributes_to_take.columns]
 
-    def classify(self, data_to_classify):
+    def predict(self, data_to_classify):
         """
         Classifies data by checking which answer is the most common in the entire forest.
 
