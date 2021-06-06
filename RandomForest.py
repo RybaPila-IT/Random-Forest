@@ -10,7 +10,7 @@ class RandomForest:
     """
     Creates random forest with a specified number of trees.
     """
-    def __init__(self, number_of_trees: int, data: DataFrame, target_column_name, tree_size):
+    def __init__(self, number_of_trees: int, data: DataFrame, target_column_name: str, tree_size: int):
         self.number_of_trees = number_of_trees
         self.data = data
         self.target_column_name = target_column_name
@@ -22,20 +22,18 @@ class RandomForest:
             random_subset = []
             random_subset = self.pick_random_subset(random_subset)
             random_attributes = []
-            random_attributes = self.pick_random_attributes(random_attributes)
+            random_attributes = self.pick_random_attributes()
             tree_data = self.data.iloc[random_subset, random_attributes]
             tree = DecisionTree(tree_data, self.target_column_name)
             self.forest.append(tree)
 
-    def pick_random_subset(self, random_subset):
+    def pick_random_subset(self, random_subset: list) -> list:
         for row_index in range(0, self.tree_size):
             random_subset.append(np.random.randint(0, len(self.data)))
         return random_subset
 
-    def pick_random_attributes(self, random_attributes):
+    def pick_random_attributes(self) -> list:
         attributes = [col for col in self.data.columns if col != self.target_column_name]
-        # TODO: number of attributes could be parametrized for test purposes (it's floor of sqrt
-        #  of all attributes for now)
         for _ in range(0, len(self.data.columns) - math.floor(math.sqrt(len(self.data.columns)))):
             attribute_index = np.random.randint(0, len(attributes))
             attributes.pop(attribute_index)
