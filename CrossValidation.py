@@ -7,7 +7,7 @@ class CrossValidator:
     Class representing cross validator for splitting data into test and training subsets. Divides given data
     into k chunks of equal size.
     """
-    def __init__(self, data: pd.DataFrame, k):
+    def __init__(self, data: pd.DataFrame, k: int):
         self.k = k
         self.subset_pairs = []
 

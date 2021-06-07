@@ -1,20 +1,20 @@
+# Authors: Radosław Radziukiewicz, Julia Skoneczna
 import pandas as pd
-from DecisionTreeClassifier import DecisionTree
-from CrossValidation import CrossValidator
 from Test import TestRunner
 
 DATA_POR = 'data/student-por.csv'
 DATA_MAT = 'data/student-mat.csv'
 TARGET = 'Dalc'
-TARGET_COL = 26
 
 if __name__ == '__main__':
-    test = TestRunner()
-    test.forest_test()
-    #
-    # # Used for previous model verification; Left for possible further bugs.
-    # data_2 = pd.DataFrame({'Outlook': ['S', 'S', 'O', 'R', 'R', 'R', 'O', 'S', 'S', 'R', 'S', 'O', 'O', 'R'],
-    #                        'Play': ['N', 'N', 'Y', 'Y', 'Y', 'N', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N'],
-    #                        'Temp': ['H', 'H', 'H', 'M', 'C', 'C', 'C', 'M', 'C', 'M', 'M', 'M', 'H', 'M'],
-    #                        'Hum': ['H', 'H', 'H', 'H', 'N', 'N', 'N', 'H', 'N', 'N', 'N', 'H', 'N', 'H'],
-    #                        'Wind': ['W', 'S', 'W', 'W', 'W', 'S', 'S', 'W', 'W', 'W', 'S', 'S', 'W', 'S']})
+    data_mat = pd.read_csv(DATA_MAT)
+    data_por = pd.read_csv(DATA_POR)
+    data_full = pd.concat([data_por, data_mat], axis=0)
+    test = TestRunner(data_mat, TARGET)
+    # Tree size tests
+    # print(test.test_tree_size_in_forest(4, 20, [20, 40, 60]))
+    # Forest size tests
+    # print(test.test_forest_size(4, [60], 45))
+    # Cross validation tests
+    print(test.test_cross_validation_split([2], 60, 45))
+
